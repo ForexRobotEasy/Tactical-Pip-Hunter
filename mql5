@@ -1,0 +1,94 @@
+
+//+------------------------------------------------------------------+
+//|                                                   Tactical Pip Hunter |
+//|                                Expert Adviser for price action trading |
+//|                                            Developed by Forex Robot Easy Team |
+//|                                                    forexroboteasy.com |
+//+------------------------------------------------------------------+
+
+// Input parameters
+input int TradeVolume = 0.1; // Trading volume
+input double TakeProfit = 10; // Take profit in pips
+input double StopLoss = 20; // Stop loss in pips
+input int TrendPeriod = 14; // Period for trend analysis
+
+// Global variables
+double trend; // Current trend direction
+double prevClose; // Previous closing price
+
+// Initialization function
+void OnInit()
+{
+    // Set initial values
+    trend = 0;
+    prevClose = 0;
+}
+
+// Price action trading function
+void PriceActionTrading()
+{
+    double currentClose = Close[0];
+    
+    // Check for potential trading opportunities
+    if (prevClose != 0 && currentClose > prevClose && trend > 0) // Bullish pattern
+    {
+        // Open a buy order
+        OrderSend(Symbol(), OP_BUY, TradeVolume, currentClose, 0, currentClose - StopLoss * Point, currentClose + TakeProfit * Point, 'Bullish Pattern');
+    }
+    else if (prevClose != 0 && currentClose < prevClose && trend < 0) // Bearish pattern
+    {
+        // Open a sell order
+        OrderSend(Symbol(), OP_SELL, TradeVolume, currentClose, 0, currentClose + StopLoss * Point, currentClose - TakeProfit * Point, 'Bearish Pattern');
+    }
+    
+    prevClose = currentClose; // Update previous closing price
+}
+
+// Trend capturing function
+void TrendCapturing()
+{
+    double trendBuffer[];
+    
+    // Calculate the current trend direction using a simple moving average
+    ArraySetAsSeries(trendBuffer, true);
+    ArrayResize(trendBuffer, TrendPeriod);
+    CopyClose(Symbol(), PERIOD_CURRENT, 0, TrendPeriod, trendBuffer);
+    
+    double trendSum = 0;
+    for (int i = 0; i < TrendPeriod; i++)
+    {
+        trendSum += trendBuffer[i];
+    }
+    
+    trend = trendSum / TrendPeriod;
+}
+
+// Scalping tool function
+void ScalpingTool()
+{
+    // Implement scalping strategy here
+    // ...
+}
+
+// Dynamic adjustment function
+void DynamicAdjustment()
+{
+    // Implement dynamic adjustment based on market conditions and trader preferences here
+    // ...
+}
+
+// Expert Adviser start function
+void OnTick()
+{
+    TrendCapturing();
+    PriceActionTrading();
+    ScalpingTool();
+    DynamicAdjustment();
+}
+
+// Logical conclusion
+void OnDeinit(const int reason)
+{
+    // Perform necessary actions before the Expert Adviser is removed from the chart
+    // ...
+}
